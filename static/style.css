@@ -108,22 +108,70 @@ textarea:focus {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
+/* === বাটনকে আরও বড় ও সুন্দর করা === */
 .btn {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 28px 0 0 0;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
-    padding: 15px 40px;
-    font-size: 18px;
+    padding: 14px 0;      /* আগে ছিল 20px 0, এখন 14px 0 */
+    font-size: 18px;      /* আগে ছিল 22px, এখন 18px */
     border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: 
+        all 0.3s cubic-bezier(.25,.8,.25,1),
+        box-shadow 0.2s,
+        transform 0.15s;
     font-weight: bold;
     letter-spacing: 1px;
+    box-shadow: 0 8px 24px 0 rgba(52, 152, 219, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+.btn:active:before {
+    width: 250%;
+    height: 250%;
 }
 
 .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 15px var(--shadow-color);
+    transform: translateY(-5px) scale(1.04);
+    box-shadow: 0 16px 32px 0 rgba(52, 152, 219, 0.18);
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.25);
+}
+
+.btn i { font-size: 24px; margin-right: 8px; vertical-align: middle; }
+
+/* মোবাইলের জন্য */
+@media (max-width: 480px) {
+    .btn {
+        width: 100%;
+        font-size: 18px;
+        padding: 16px 0;
+        max-width: 100%;
+    }
 }
 
 /* ... (আপনার স্পিনার, এরর, ইত্যাদি কোড অপরিবর্তিত) ... */
@@ -153,7 +201,7 @@ textarea:focus {
 }
 
 
-/* রেসপন্সিভ মিডিয়া কোয়েরি */
+/* রেসপন্সিভ মিডিয়া কোয়েরি */
 @media (max-width: 768px) {
     body { align-items: flex-start; padding: 15px; }
     .container { padding: 25px; }
