@@ -62,7 +62,7 @@ def detect():
     try:
         text = request.get_json().get('text', '').strip()
         if not text:
-            return jsonify({'error': 'দয়া করে টেক্সট লিখুন'}), 400
+            return jsonify({'error': 'Please enter some text to analyze.'}), 400
 
         # ভাষা শনাক্তকরণ
         try:
@@ -83,7 +83,7 @@ def detect():
             vectorizer = VECTORIZERS.get('en') or VECTORIZERS.get('bn')
 
         if not model or not vectorizer:
-            return jsonify({'error': 'সার্ভারে কোনো উপযুক্ত মডেল পাওয়া যায়নি।'}), 501
+            return jsonify({'error': 'No suitable model found on the server.'}), 501
 
         processed_text = preprocess_text(text)
         vectorized_text = vectorizer.transform([processed_text] if processed_text else [""])
@@ -93,8 +93,7 @@ def detect():
         
         hate_prob = round(float(probability[1]) * 100, 2)
         normal_prob = round(float(probability[0]) * 100, 2)
-        result = "হ্যাট স্পিচ" if prediction == 1 else "নরমাল স্পিচ"
-        
+        result = "Hate speech" if prediction == 1 else "Normal speech"
         return jsonify({
             'text': text,
             'result': result,
@@ -104,7 +103,7 @@ def detect():
 
     except Exception as e:
         logger.error(f"'/detect' রুটে ত্রুটি: {e}", exc_info=True)
-        return jsonify({'error': 'সার্ভারে একটি অপ্রত্যাশিত সমস্যা হয়েছে'}), 500
+        return jsonify({'error': 'An unexpected server error occurred.'}), 500
 
 # --- লোকাল টেস্টিং-এর জন্য ---
 if __name__ == '__main__':
