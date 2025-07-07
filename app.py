@@ -37,6 +37,9 @@ def load_all_models():
         else:
             logger.warning(f"⚠️ {lang_name} ({lang_code}) মডেল ফাইল খুঁজে পাওয়া যায়নি: {model_path}")
 
+# --- মডেল লোড করা (Render-এ ইম্পোর্টের সময়েই) ---
+load_all_models()
+
 # --- টেক্সট প্রি-প্রসেসিং ---
 def preprocess_text(text):
     if not isinstance(text, str): return ""
@@ -79,7 +82,7 @@ def detect():
             model = MODELS.get('en') or MODELS.get('bn')
             vectorizer = VECTORIZERS.get('en') or VECTORIZERS.get('bn')
 
-        if not model:
+        if not model or not vectorizer:
             return jsonify({'error': 'সার্ভারে কোনো উপযুক্ত মডেল পাওয়া যায়নি।'}), 501
 
         processed_text = preprocess_text(text)
@@ -103,10 +106,6 @@ def detect():
         logger.error(f"'/detect' রুটে ত্রুটি: {e}", exc_info=True)
         return jsonify({'error': 'সার্ভারে একটি অপ্রত্যাশিত সমস্যা হয়েছে'}), 500
 
-# --- অ্যাপ চালনার প্রধান অংশ ---
+# --- লোকাল টেস্টিং-এর জন্য ---
 if __name__ == '__main__':
-    # অ্যাপ চালু হওয়ার সময় মডেল লোড করা
-    load_all_models()
-    
-    # Gunicorn এই অংশটি ব্যবহার করবে না, তবে লোকাল টেস্টিং-এর জন্য রাখা হলো
     app.run(host='0.0.0.0', port=5000)
