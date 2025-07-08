@@ -115,71 +115,6 @@ textarea:focus {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* === বাটনকে আরও বড় ও সুন্দর করা === */
-.btn {
-    display: block;
-    width: 100%;
-    max-width: none;
-    margin: 28px 0 0 0;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border: none;
-    padding: 14px 0;
-    font-size: 18px;
-    border-radius: 50px;
-    cursor: pointer;
-    transition:
-        box-shadow 0.2s,
-        transform 0.15s,
-        background 0.4s;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0 8px 24px 0 rgba(52, 152, 219, 0.15);
-    position: relative;
-    overflow: hidden;
-    /* নতুন গ্লো ইফেক্ট */
-    box-shadow:
-        0 8px 24px 0 rgba(52, 152, 219, 0.15),
-        0 0 0 0 rgba(46, 204, 113, 0.15),
-        0 0 16px 0 rgba(52, 152, 219, 0.10);
-}
-
-.btn:hover {
-    transform: translateY(-4px) scale(1.03);
-    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
-    box-shadow:
-        0 16px 32px 0 rgba(52, 152, 219, 0.18),
-        0 0 16px 4px rgba(46, 204, 113, 0.18);
-    filter: brightness(1.08);
-}
-
-.btn:active {
-    transform: scale(0.97);
-    box-shadow:
-        0 4px 12px 0 rgba(52, 152, 219, 0.10),
-        0 0 8px 2px rgba(46, 204, 113, 0.12);
-    filter: brightness(0.98);
-}
-
-.btn:focus {
-    outline: none;
-    box-shadow:
-        0 0 0 4px rgba(52, 152, 219, 0.25),
-        0 8px 24px 0 rgba(52, 152, 219, 0.15);
-}
-
-.btn i { font-size: 24px; margin-right: 8px; vertical-align: middle; }
-
-/* মোবাইলের জন্য */
-@media (max-width: 480px) {
-    .btn {
-        width: 100%;
-        font-size: 18px;
-        padding: 16px 0;
-        max-width: 100%;
-    }
-}
-
 /* ... (আপনার স্পিনার, এরর, ইত্যাদি কোড অপরিবর্তিত) ... */
 .result-container { display: none; margin-top: 30px; padding: 30px; border-radius: 15px; text-align: left; background: var(--result-bg); border-left: 5px solid; animation: fadeIn 0.5s ease; }
 .result-container.hate { border-color: var(--hate-color); }
@@ -214,7 +149,6 @@ textarea:focus {
     .container { padding: 25px; }
     h1 { font-size: 26px; }
     textarea { height: 120px; font-size: 16px; }
-    .btn { padding: 12px 30px; font-size: 16px; }
 }
 
 @media (max-width: 480px) {
