@@ -25,11 +25,6 @@
         
         <div id="error-message" class="error" style="display: none;"></div>
         
-        <button id="check-btn" class="btn">
-            <span><i class="fas fa-search"></i>Check</span>
-            <div class="spinner"></div>
-        </button>
-        
         <div id="result-container" class="result-container" style="display: none;">
             <div class="result-header">
                 <i id="result-icon" class="fas"></i>
@@ -72,95 +67,114 @@
     </div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputText = document.getElementById('input-text');
-            const checkBtn = document.getElementById('check-btn');
-            const errorMessage = document.getElementById('error-message');
-            const resultContainer = document.getElementById('result-container');
-            const resultIcon = document.getElementById('result-icon');
-            const resultText = document.getElementById('result-text');
-            const outputText = document.getElementById('output-text');
-            const hatePercent = document.getElementById('hate-percent');
-            const normalPercent = document.getElementById('normal-percent');
-            const hateProgress = document.getElementById('hate-progress');
-            const normalProgress = document.getElementById('normal-progress');
-            
-            checkBtn.addEventListener('click', function() {
-                const text = inputText.value.trim();
-                if (!text) {
-                    showError("Please Enter Some Text to Analyze.");
-                    return;
-                }
-                
-                checkBtn.disabled = true;
-                checkBtn.classList.add('loading');
-                hideError();
-                hideResult();
-                
-                fetch('/detect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: text })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // সার্ভার থেকে আসা JSON এরর মেসেজ দেখানোর চেষ্টা
-                        return response.json().then(err => { throw new Error(err.error || 'সার্ভার থেকে সঠিক রেসপন্স পাওয়া যায়নি'); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    showResult(data);
-                })
-                .catch(error => {
-                    showError(`Error: ${error.message}`);
-                })
-                .finally(() => {
-                    checkBtn.disabled = false;
-                    checkBtn.classList.remove('loading');
-                });
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+    const inputText = document.getElementById('input-text');
+    const errorMessage = document.getElementById('error-message');
+    const resultContainer = document.getElementById('result-container');
+    const resultIcon = document.getElementById('result-icon');
+    const resultText = document.getElementById('result-text');
+    const outputText = document.getElementById('output-text');
+    const hatePercent = document.getElementById('hate-percent');
+    const normalPercent = document.getElementById('normal-percent');
+    const hateProgress = document.getElementById('hate-progress');
+    const normalProgress = document.getElementById('normal-progress');
 
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
-                hideResult();
-            }
-            
-            function hideError() {
-                errorMessage.style.display = 'none';
-            }
-            
-            function hideResult() {
-                resultContainer.style.display = 'none';
-            }
-            
-            function showResult(data) {
-                const isHate = data.result === 'Hate Speech';
-                
-                resultContainer.className = 'result-container ' + (isHate ? 'hate' : 'normal');
-                resultIcon.className = 'fas ' + (isHate ? 'fa-exclamation-triangle' : 'fa-check-circle');
-                
-                resultText.textContent = data.result;
-                outputText.textContent = data.text;
-                
-                hatePercent.textContent = data.hate_prob + '%';
-                normalPercent.textContent = data.normal_prob + '%';
-                
-                // প্রোগ্রেস বার রিসেট করা
-                hateProgress.style.width = '0%';
-                normalProgress.style.width = '0%';
+    let isRequestInProgress = false;
+    let hasScrolledOnce = false; // Flag to scroll only on the first result.
 
-                // এনিমেশনের জন্য সামান্য দেরি
-                setTimeout(() => {
-                    hateProgress.style.width = data.hate_prob + '%';
-                    normalProgress.style.width = data.normal_prob + '%';
-                }, 100);
-                
-                resultContainer.style.display = 'block';
-                resultContainer.scrollIntoView({ behavior: 'smooth' });
+    // Debounce function to limit how often a function is called
+    function debounce(func, delay) {
+        let timeoutId;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    function performAnalysis() {
+        if (isRequestInProgress) return;
+
+        const text = inputText.value.trim();
+        if (!text) {
+            hideError();
+            hideResult();
+            return;
+        }
+
+        isRequestInProgress = true;
+        hideError();
+
+        fetch('/detect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.error || 'সার্ভার থেকে সঠিক রেসপন্স পাওয়া যায়নি'); });
             }
+            return response.json();
+        })
+        .then(data => {
+            showResult(data);
+        })
+        .catch(error => {
+            showError(`Error: ${error.message}`);
+        })
+        .finally(() => {
+            isRequestInProgress = false;
         });
+    }
+
+    // Create a debounced version of the analysis function.
+    const debouncedAutoAnalysis = debounce(performAnalysis, 700);
+
+    // Listen for input events on the textarea to trigger automatic analysis.
+    inputText.addEventListener('input', function() {
+        const text = inputText.value.trim();
+        if (text) {
+            debouncedAutoAnalysis();
+        } else {
+            // If textarea is cleared, hide results and error messages.
+            hideError();
+            hideResult();
+            hasScrolledOnce = false; // Reset scroll flag if text is cleared
+        }
+    });
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        hideResult();
+    }
+
+    function hideError() {
+        errorMessage.style.display = 'none';
+    }
+
+    function hideResult() {
+        resultContainer.style.display = 'none';
+    }
+
+    function showResult(data) {
+        const isHate = data.result === 'Hate Speech';
+        resultContainer.className = 'result-container ' + (isHate ? 'hate' : 'normal');
+        resultIcon.className = 'fas ' + (isHate ? 'fa-exclamation-triangle' : 'fa-check-circle');
+        resultText.textContent = data.result;
+        outputText.textContent = data.text;
+        hatePercent.textContent = data.hate_prob + '%';
+        normalPercent.textContent = data.normal_prob + '%';
+        hateProgress.style.width = data.hate_prob + '%';
+        normalProgress.style.width = data.normal_prob + '%';
+        resultContainer.style.display = 'block';
+        
+        // Scroll to the result container only for the first analysis
+        if (!hasScrolledOnce) {
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+            hasScrolledOnce = true;
+        }
+    }
+    });
     </script>
 </body>
 </html>
