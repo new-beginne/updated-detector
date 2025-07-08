@@ -93,7 +93,7 @@ def detect():
         
         hate_prob = round(float(probability[1]) * 100, 2)
         normal_prob = round(float(probability[0]) * 100, 2)
-        result = "Hate speech" if prediction == 1 else "Normal speech"
+        result = "Hate Speech" if prediction == 1 else "Normal Speech"
         return jsonify({
             'text': text,
             'result': result,
